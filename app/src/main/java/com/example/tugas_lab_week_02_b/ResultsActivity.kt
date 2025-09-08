@@ -4,12 +4,10 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.activity.enableEdgeToEdge
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 
 class ResultsActivity : AppCompatActivity() {
     companion object {
@@ -21,26 +19,31 @@ class ResultsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_results)
 
-        if(intent != null){
+        if (intent != null) {
             val colorCode = intent.getStringExtra(COLOR_KEY)
 
-            val backgroundScreen =
-                findViewById<ConstraintLayout>(R.id.background_screen)
+            val backgroundScreen = findViewById<ConstraintLayout>(R.id.background_screen)
+
             try {
                 backgroundScreen.setBackgroundColor(Color.parseColor("#$colorCode"))
+            } catch (ex: IllegalArgumentException) {
+                val errorIntent = Intent()
+                errorIntent.putExtra(ERROR_KEY, true)
+                setResult(Activity.RESULT_OK, errorIntent)
+                finish()
+                return
             }
-            catch (ex: IllegalArgumentException){
-                Intent().let{
-                        errorIntent ->
-                    errorIntent.putExtra(ERROR_KEY, true)
-                    setResult(Activity.RESULT_OK, errorIntent)
-                    finish()
-                }
-            }
-            val resultMessage =
-                findViewById<TextView>(R.id.color_code_result_message)
-            resultMessage.text = getString(R.string.color_code_result_message,
-                colorCode?.uppercase())
+
+            val resultMessage = findViewById<TextView>(R.id.color_code_result_message)
+            resultMessage.text = getString(
+                R.string.color_code_result_message,
+                colorCode?.uppercase()
+            )
+        }
+
+        val backButton = findViewById<Button>(R.id.back_button)
+        backButton.setOnClickListener {
+            finish()
         }
     }
 }
